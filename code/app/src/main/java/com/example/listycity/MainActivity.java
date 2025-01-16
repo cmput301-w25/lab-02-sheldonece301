@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     ListView cityList;
     ArrayAdapter<String> cityAdapter;
     ArrayList<String> dataList;
+    int citySelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        // stores and initializes container for city, buttons, and input text
         cityList = findViewById(R.id.city_list);
 
         Button addCityButton = findViewById(R.id.add_city);
@@ -39,30 +41,44 @@ public class MainActivity extends AppCompatActivity {
 
         TextInputEditText cityInput = findViewById(R.id.enter_city);
 
+        // array with cities
         String []cities = {"Edmonton", "Calgary"};
 
+        // initialize and store data in list
         dataList = new ArrayList<>();
         dataList.addAll(Arrays.asList(cities));
 
+        // initialize adapter for scrollable list
         cityAdapter = new ArrayAdapter<>(this, R.layout.content, dataList);
         cityList.setAdapter(cityAdapter);
 
+        // sets city input and confirm button as visible when clicking add city
         addCityButton.setOnClickListener(v -> {
             cityInput.setVisibility(ListView.VISIBLE);
             confirmCityAdd.setVisibility(ListView.VISIBLE);
         });
 
+        // updates list with new city added
         confirmCityAdd.setOnClickListener(v -> {
             String nameOfCity = cityInput.getText().toString();
             if (!nameOfCity.isEmpty()) {
                 dataList.add(nameOfCity);
                 cityAdapter.notifyDataSetChanged();
                 cityInput.setText("");
+                cityInput.setVisibility(ListView.GONE);
+                confirmCityAdd.setVisibility(ListView.GONE);
             }
         });
 
+        // retrieves selected city and stores position in citySelected variable
+        cityList.setOnItemClickListener((parent, view, position, id) -> {
+            citySelected = position;
+            cityAdapter.notifyDataSetChanged();
+        });
+
+        // uses data stored in citySelected to remove city accordingly
         deleteCityButton.setOnClickListener(v -> {
-            dataList.remove(1);
+            dataList.remove(citySelected);
             cityAdapter.notifyDataSetChanged();
         });
 
